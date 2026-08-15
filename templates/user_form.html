@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶資料輸入</title>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
+    <!-- 引入 Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入外部 CSS 文件 -->
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <div class="bg-img">
+        <div class="content">
+            <header>用戶資料輸入</header>
+            <form id="user-form">
+                <!-- 隱藏的 Line ID 欄位 -->
+                <input type="hidden" id="u_id" name="u_id" value="{{ u_id }}">
+
+                <div class="field">
+                    <span class="fa fa-user"></span>
+                    <input type="text" id="name" name="name" required placeholder="姓名" value="{{ user_dict.name or '' }}" {% if user_dict.update_only_weight %}readonly{% endif %}>
+                </div>
+                <div class="field space">
+                    <span class="fa fa-lock"></span>
+                    <select id="gender" name="gender" required {% if user_dict.update_only_weight %}disabled{% endif %}>
+                        <option value="" disabled {% if user_dict.gender is none %}selected{% endif %}>選擇性別</option>
+                        <option value="male" {% if user_dict.gender == 'male' %}selected{% endif %}>男</option>
+                        <option value="female" {% if user_dict.gender == 'female' %}selected{% endif %}>女</option>
+                    </select>
+                </div>
+                <div class="field space">
+                    <span class="fa fa-lock"></span>
+                    <input type="number" id="age" name="age" required placeholder="年齡" value="{{ user_dict.age or '' }}" min="1" max="120" {% if user_dict.update_only_weight %}readonly{% endif %}>
+                </div>
+                <div class="field space">
+                    <span class="fa fa-lock"></span>
+                    <input type="number" id="height" name="height" required placeholder="身高(cm)" value="{{ user_dict.height or '' }}" min="30" max="300" {% if user_dict.update_only_weight %}readonly{% endif %}>
+                </div>
+                <div class="field space">
+                    <span class="fa fa-lock"></span>
+                    <input type="number" id="weight" name="weight" required placeholder="體重(kg)" value="{{ user_dict.weight or '' }}">
+                </div>
+                <br />
+                <div class="field">
+                    <input type="submit" value="提交">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 放置在 body 末尾的腳本和樣式 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#user-form').on('submit', function (event) {
+                event.preventDefault();  // 阻止表單默認提交
+
+                // 收集表單資料
+                var formData = {
+                    u_id: $('#u_id').val().trim(),
+                    name: $('#name').val().trim(),
+                    gender: $('#gender').val().trim(),
+                    age: $('#age').val().trim(),
+                    height: $('#height').val().trim(),
+                    weight: $('#weight').val().trim(),
+                };
+
+                // 表單驗證
+                if (!validateFormData(formData)) {
+                    return;
+                }
+
+                // 使用 jQuery AJAX 發送資料到 '/form' 路由
+                $.ajax({
+                    url: window.location.pathname,  // 使用當前頁面的 URL
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        // 成功時的處理
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,  // 成功提示
+                                text: '資料已成功提交，請手動返回 LINE 應用。',
+                                confirmButtonText: '確認'
+                            }).then(() => {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: '請關閉此頁面以返回 LINE。',
+                                    text: '如果無法自動返回，請手動關閉本頁。',
+                                    showConfirmButton: false,
+                                    timer: 3000  // 3 秒後自動關閉提示
+                                });
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,  // 失敗提示
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '資料提交失敗！',
+                            text: '伺服器響應錯誤。'
+                        });
+                    }
+                });
+            });
+
+            function validateFormData(formData) {
+                // 檢查是否為空
+                for (const key in formData) {
+                    if (formData[key] === "") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: `${key} 欄位不能為空`
+                        });
+                        return false;
+                    }
+                }
+
+                // 格式驗證
+                if (!/^[\u4e00-\u9fa5a-zA-Z\s]+$/.test(formData.name)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '姓名只能包含中文、英文和空格'
+                    });
+                    return false;
+                }
+
+                if (isNaN(formData.age) || formData.age <= 0 || formData.age < 1 || formData.age > 120) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '年齡必須在 1 到 120 歲之間'
+                    });
+                    return false;
+                }
+
+                if (isNaN(formData.height) || formData.height <= 0 || formData.height < 30 || formData.height > 300) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '身高必須在 30 到 300 cm 之間'
+                    });
+                    return false;
+                }
+
+                if (isNaN(formData.weight) || formData.weight <= 0 || formData.weight < 2 || formData.weight > 500) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '體重必須在 2 到 500 kg 之間'
+                    });
+                    return false;
+                }
+                
+                // 字元過濾
+                const regex = /[<>]/g;
+                for (const key in formData) {
+                    if (regex.test(formData[key])) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: `${key} 欄位包含不允許的字元`
+                        });
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        });
+    </script>
+</body>
+
+</html>

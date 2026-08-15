@@ -1,0 +1,83 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment and Secret Configurations (CRITICAL SECURITY)
+config.ini
+config.local.ini
+*.json.secret
+*-*.json
+kenweather-*.json
+service-account*.json
+credentials.json
+*.key
+*.pem
+*.pfx
+
+# Database files (User privacy and security)
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.db-journal
+
+# Temporary runtime files & User uploads
+static/image_*.jpg
+static/image_*.png
+static/image_*.jpeg
+finalrrich/
+finalrrich_resized/
+
+# OS and Editor specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+logs/
+
+# Dash / Flask
+instance/
+.webassets-cache
