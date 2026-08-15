@@ -99,12 +99,12 @@ class HealthDashboard:
                 html.Div(
                     [
                         html.H1(
-                            "✨ Lady卡卡 專屬健康數據儀表板 ✨",
+                            "Lady卡卡 健康數據儀表板",
                             className="text-center font-weight-bold mb-2",
-                            style={"color": "#334155", "fontSize": "26px", "fontWeight": "700"},
+                            style={"color": "#334155", "fontSize": "24px", "fontWeight": "700"},
                         ),
                         html.P(
-                            f"嗨，{user_name}！來看看您近期的飲食與運動熱量趨勢吧！",
+                            f"Hi, {user_name}！來看看今天的狀況吧！",
                             className="text-center text-muted mb-4",
                         ),
                     ],
