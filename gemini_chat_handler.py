@@ -33,7 +33,7 @@ class GeminiChatHandler:
         user_states.setdefault(user_id, {})["in_gemini_chat"] = True
         self.line_bot_api.reply_message(
             reply_token,
-            TextSendMessage(text="已為您開啟「Lady卡卡 AI客服小幫手」，您可以隨時向我提問任何運動與飲食問題喔！如欲結束請輸入「結束」或「掰掰」。"),
+            TextSendMessage(text="卡卡在！有什麼飲食或運動問題都可以直接問我喔～如果想結束對話輸入『掰掰』或『結束』就行啦！"),
         )
 
     def stop_gemini_chat(self, user_states: Dict[str, Any], user_id: str, reply_token: str):
@@ -41,7 +41,7 @@ class GeminiChatHandler:
         user_states.setdefault(user_id, {})["in_gemini_chat"] = False
         self.line_bot_api.reply_message(
             reply_token,
-            TextSendMessage(text="已退出小幫手對話，隨時點選選單回到主要功能喔！"),
+            TextSendMessage(text="好喔，已經退出小幫手對話囉！隨時點下方選單都可以回到主要功能～"),
         )
 
     def handle_gemini_chat(self, user_states: Dict[str, Any], user_id: str, user_message: str, reply_token: str) -> bool:
@@ -60,10 +60,10 @@ class GeminiChatHandler:
             self.line_bot_api.reply_message(reply_token, TextSendMessage(text=response_text))
         except LineBotApiError as e:
             logger.error(f"LINE API error in Gemini chat: {e}")
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="處理您的請求時發生錯誤，請稍後再試。"))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="目前系統有點忙碌，稍等一下再試試看喔！"))
         except Exception as ex:
             logger.error(f"Error in Gemini chat: {ex}")
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="小幫手目前有點忙碌，請稍後再試一次！"))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="目前連線有點忙碌，稍等一下再問我一次喔！"))
 
         return True
 
@@ -78,20 +78,19 @@ class GeminiChatHandler:
         history_context = "\n".join(history[-6:]) if history else "無"
 
         prompt = f"""
-你是一位充滿熱情、正能量、溫暖體貼的專屬運動與體態管理顧問「Lady卡卡」。
+你是一位說話自然、口語、親切像好朋友一樣的運動與健康顧問「Lady卡卡」。
 使用者的名字是：{nickname}。
 
-【對話歷史】：
+【對話紀錄】：
 {history_context}
 
-【使用者本次提問】：
+【使用者剛才說】：
 {user_message}
 
-【回覆準則】：
-1. 嚴格使用繁體中文，字數控制在 160 字以內。
-2. 語氣溫暖愉快、鼓勵正面，適度使用 emoji。
-3. 針對提問給予科學、健康且安全的運動或飲食指引。若使用者提到不切實際或極端的運動方式（如連續跑步300小時、不吃不喝），請委婉導正並提供安全方案。
-4. 請不要使用 Markdown 符號（如 ** 或 * 或 #），直接使用優美流暢的文字。
+【回覆要求】：
+1. 請用自然流暢、像朋友聊天的繁體中文口吻回答，不要有死板的客服腔或 AI 機器人感。
+2. 字數控制在 150 字以內，不要用 Markdown 的「**」或「#」符號。
+3. 如果對方問運動或飲食，給予實用又安全的小建議；如果對方講不合理的運動方式（例如連續跑步300小時），用幽默輕鬆的方式提醒他注意安全。
 """
         try:
             human_message = HumanMessage(content=prompt)
@@ -109,4 +108,4 @@ class GeminiChatHandler:
             return content
         except Exception as e:
             logger.error(f"Error invoking Gemini: {e}")
-            return f"親愛的 {nickname}，運動和健康是最好的投資！保持規律節奏，每天進步一點點，卡卡為你加油！💪✨"
+            return f"嘿 {nickname}！運動跟健康都是慢慢累積的，按照自己的節奏來就好，卡卡為你加油！💪"

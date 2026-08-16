@@ -29,7 +29,7 @@ class generate_plan:
         user_data = Userdata(self.user_id)
         user_record = user_data.search_data("u_id", self.user_id)
         if not user_record:
-            return None, "無法找到您的基本資料，請先在「我的狀態」更新個人基本資料喔！"
+            return None, "找不到你的基本資料耶，請先去「我的狀態」填一下個人資料喔！"
         return user_record, None
 
     def generate_plan(self) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
@@ -38,7 +38,7 @@ class generate_plan:
         if error_message or not user_record:
             return None, {"error": error_message}
 
-        name = user_record.get("name", "健康追求者")
+        name = user_record.get("name", "夥伴")
         age = int(user_record.get("age", 25))
         gender_val = user_record.get("gender")
         is_male = gender_val in (1, True, "1", "male", "男")
@@ -102,20 +102,19 @@ class generate_plan:
 
         # 5. Generate warm and encouraging advice with Gemini
         prompt = f"""
-你是一位專業且充滿溫度的健康減重與體態顧問「Lady卡卡」。
-請為使用者【{name}】撰寫一份專屬的個人化減肥/體態攻略：
+你是一位說話自然、親切、口語的運動與減重夥伴「Lady卡卡」。
+請用像朋友/教練聊天的自然口吻，為【{name}】寫一段減肥/體態建議：
 
-【個人健康數據】：
+【身體數值】：
 - 目前體重：{weight:.1f} kg
 - 目標體重：{self.target_weight:.1f} kg（{goal_desc}）
-- 基礎代謝率（BMR）：{bmr:.0f} 大卡
-- 每日總能量消耗（TDEE）：{daily_calories:.0f} 大卡
+- 基礎代謝（BMR）：{bmr:.0f} 大卡
+- 每日消耗（TDEE）：{daily_calories:.0f} 大卡
 - 建議每日攝取熱量：{recommended_daily_calories:.0f} 大卡
 
 【回覆要求】：
-1. 請以溫暖、親切、鼓勵的語氣，肯定對方的目標，並給予清晰的飲食熱量與日常運動大方向。
-2. 嚴格使用繁體中文，字數控制在 160 字以內，適度加入 emoji。
-3. 請不要使用 Markdown 符號（如 ** 或 * 或 #），直接使用完整流暢的語句。
+1. 用親切、口語的繁體中文，肯定他的目標，給他一些飲食與運動方向。
+2. 字數控制在 150 字以內，不要用 Markdown 符號（如 ** 或 * 或 #），不要有死板的機器人感。
 """
         try:
             result = self.llm_gemini.invoke([HumanMessage(content=prompt)])
@@ -124,8 +123,8 @@ class generate_plan:
         except Exception as e:
             logger.error(f"Error calling Gemini for personalized plan: {e}")
             refined_plan = (
-                f"親愛的 {name}！您的基礎代謝率為 {bmr:.0f} 大卡，為了在 {weeks} 週內達成 {self.target_weight} kg 的目標，"
-                f"建議您每日攝取約 {recommended_daily_calories:.0f} 大卡。搭配規律運動與原型食物，卡卡陪你一起健康蛻變！✨"
+                f"{name} 你好呀！你的基礎代謝大約是 {bmr:.0f} 大卡。如果想在 {weeks} 週內達成 {self.target_weight} kg 的目標，"
+                f"建議每天攝取約 {recommended_daily_calories:.0f} 大卡，多吃原型食物搭配適量運動，卡卡陪你一起加油！💪"
             )
 
         standards = {

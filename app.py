@@ -193,12 +193,12 @@ class Lineca:
                 elif user_message == "飲食打卡":
                     self.user_states[user_id]["state"] = "awaiting_food"
                     return self.line_bot_api.reply_message(
-                        reply_token, TextSendMessage(text="請輸入您今天吃了什麼（例如：『我吃了一碗牛肉麵和一顆蘋果』）或直接傳送食物照片喔！")
+                        reply_token, TextSendMessage(text="請輸入您今天吃了什麼～（例如『我吃了一碗牛肉麵加一顆茶葉蛋』），或是直接拍食物照片丟給我也行！")
                     )
                 elif user_message == "燃脂打卡":
                     self.user_states[user_id]["state"] = "awaiting_exercise"
                     return self.line_bot_api.reply_message(
-                        reply_token, TextSendMessage(text="請輸入您做了什麼運動（例如：『跑步 30分鐘 5公里』或『騎腳踏車 1小時』）：")
+                        reply_token, TextSendMessage(text="請輸入你做了什麼運動～（例如『跑步 30分鐘 5公里』或『騎腳踏車 1小時』）：")
                     )
                 elif user_message == "AI減肥攻略":
                     return self.handle_ai_plan_entry(user_id, reply_token)
@@ -273,15 +273,15 @@ class Lineca:
 
             elif user_message in ["我想要去跑步", "跑步"]:
                 self.user_states[user_id]["state"] = "awaiting_running_duration"
-                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請告訴我您打算跑多久（例如：30分鐘 或 1小時）？"))
+                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="今天打算跑多久呀？（例如：30分鐘 或 1小時）"))
 
             elif user_message in ["我想要去游泳", "游泳"]:
                 self.user_states[user_id]["state"] = "awaiting_swimming_duration"
-                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請告訴我您打算游多久（例如：45分鐘 或 1小時）？"))
+                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="今天打算游多久呀？（例如：45分鐘 或 1小時）"))
 
             elif user_message in ["我想要去騎腳踏車", "騎腳踏車", "騎車"]:
                 self.user_states[user_id]["state"] = "awaiting_cycling_duration"
-                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請告訴我您打算騎多久（例如：1小時 或 2小時）？"))
+                return self.line_bot_api.reply_message(reply_token, TextSendMessage(text="今天打算騎多久呀？（例如：1小時 或 2小時）"))
 
             elif user_message == "我不知道該做什麼運動":
                 self.gemini_chat_handler.start_gemini_chat(self.user_states, user_id, reply_token)
@@ -422,12 +422,12 @@ class Lineca:
         user_data = Userdata(user_id).search_data("u_id", user_id)
         if not user_data or not user_data.get("weight"):
             self.line_bot_api.reply_message(
-                reply_token, TextSendMessage(text="請先設定您的基本資料（我的狀態 ➔ 我的基本資料），AI才能為您量身打造專屬減肥計畫喔！")
+                reply_token, TextSendMessage(text="請先設定一下基本資料（我的狀態 ➔ 我的基本資料），這樣才能幫你算專屬的減肥計畫喔！")
             )
             return
 
         self.user_states[user_id]["state"] = "awaiting_target_weight"
-        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入您想要達到的目標體重（公斤，例如：55 或 58.5）："))
+        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入你想瘦到的目標體重（公斤，例如：55 或 58.5）："))
 
     def handle_target_weight(self, user_id: str, user_message: str, reply_token: str):
         """Process target weight input and generate personalized plan."""
@@ -559,7 +559,7 @@ class Lineca:
     # --------------------------------------------------------------------------
     def ask_for_nickname(self, user_id: str, reply_token: str):
         self.user_states[user_id]["state"] = "awaiting_nickname"
-        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請告訴我您的暱稱或名字："))
+        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請告訴我你的暱稱或名字："))
 
     def handle_nickname(self, user_id: str, user_message: str, reply_token: str):
         base_url = settings.WEBSITE_URL.rstrip("/")
@@ -576,7 +576,7 @@ class Lineca:
                 QuickReplyButton(action=MessageAction(label="女", text="女"), image_url=f"{base_url}/static/icons/women.png"),
             ]
         )
-        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請選擇您的性別：", quick_reply=quick_reply))
+        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請選擇你的性別：", quick_reply=quick_reply))
 
     def handle_gender(self, user_id: str, user_message: str, reply_token: str):
         user_data = Userdata(user_id)
@@ -584,7 +584,7 @@ class Lineca:
         user_data.update_data("gender", 1 if is_male else 0)
 
         self.user_states[user_id]["state"] = "awaiting_age"
-        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入您的年齡（例如：25）："))
+        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入你的年齡（例如：25）："))
 
     def handle_age(self, user_id: str, user_message: str, reply_token: str):
         try:
@@ -594,9 +594,9 @@ class Lineca:
                 return
             Userdata(user_id).update_data("age", age)
             self.user_states[user_id]["state"] = "awaiting_height"
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入您的身高（公分 cm，例如：175）："))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入你的身高（公分 cm，例如：175）："))
         except ValueError:
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請提供有效的年齡數字。"))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入有效的年齡數字喔。"))
 
     def handle_height(self, user_id: str, user_message: str, reply_token: str):
         try:
@@ -606,9 +606,9 @@ class Lineca:
                 return
             Userdata(user_id).update_data("height", height)
             self.user_states[user_id]["state"] = "awaiting_weight"
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入您的體重（公斤 kg，例如：65.5）："))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入你的體重（公斤 kg，例如：65.5）："))
         except ValueError:
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請提供有效的身高數字。"))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入有效的身高數字喔。"))
 
     def handle_weight(self, user_id: str, user_message: str, reply_token: str):
         try:
@@ -619,10 +619,10 @@ class Lineca:
             Userdata(user_id).update_data("weight", weight)
             self.user_states[user_id]["state"] = None
             self.line_bot_api.reply_message(
-                reply_token, TextSendMessage(text="🎉 個人基本資料更新完成！現在可以開始記錄飲食、運動並享受 Lady卡卡 的專屬健康服務囉！✨")
+                reply_token, TextSendMessage(text="資料設定好囉！現在可以開始記錄飲食、運動，讓卡卡陪你一起控制熱量啦～")
             )
         except ValueError:
-            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請提供有效的體重數字。"))
+            self.line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入有效的體重數字喔。"))
 
     # --------------------------------------------------------------------------
     # Calorie Budget & Rich Menu Dynamics
@@ -642,8 +642,8 @@ class Lineca:
             base_url = settings.WEBSITE_URL.rstrip("/")
 
             calories_text = (
-                f"⚠️【熱量提醒】您今天的卡路里攝取已超標約 {exceeded_amt:.0f} 大卡囉！💪\n\n"
-                "卡卡為您推薦燃脂運動計畫，快來消耗多餘熱量恢復滿血狀態吧！🏃‍♀️✨\n\n"
+                f"⚠️ 今天熱量好像吃得有點多喔！超標了差不多 {exceeded_amt:.0f} 大卡～\n\n"
+                "快來看看卡卡幫你挑的燃脂運動，動一動把血條補回來吧！💪\n\n"
                 f"{burn_plan}"
             )
             quick_reply = QuickReply(
@@ -694,7 +694,7 @@ class Lineca:
             except Exception as e:
                 logger.error(f"Error resetting rich menu: {e}")
 
-        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="🎉 太棒了！您已成功完成燃脂任務，血條已恢復滿血！繼續保持喔！✨"))
+        self.line_bot_api.reply_message(reply_token, TextSendMessage(text="太棒啦！任務完成，血條已經幫你補滿囉～繼續保持！"))
 
     def burn_calories_plan(self, remaining_calories: float, user_id: str) -> str:
         """Calculate burn time for common activities."""

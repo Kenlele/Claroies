@@ -69,7 +69,7 @@ class CalorieAnalyzer:
         exercise_name, duration_minutes, distance_km = self.extract_exercise_info(user_input)
 
         if not exercise_name or duration_minutes is None:
-            return "請提供我完整的運動名稱、時間（例如：跑步 30分鐘 或 騎腳踏車 1小時 10公里），才能為您精確計算喔！"
+            return "要告訴我完整的運動名稱跟時間喔（例如：『跑步 30分鐘』或『騎車 1小時 10公里』），這樣我才算得出熱量！"
 
         # 3. Calculate calories burned
         calories_burned = self.calculate_calories_burned(exercise_name, duration_minutes, weight)
@@ -130,18 +130,17 @@ class CalorieAnalyzer:
     ) -> str:
         """Generate motivating and encouraging feedback from Lady卡卡."""
         prompt = f"""
-你是一位充滿活力與溫暖的運動健身教練「Lady卡卡」。
-使用者剛完成了以下運動：
-- 運動項目：{exercise_name}
-- 運動時間：{duration_minutes} 分鐘
-- 運動距離：{distance_display}
-- 預估消耗熱量：{calories_burned} 大卡
+你是一位說話自然、熱情親切的運動教練「Lady卡卡」。
+使用者剛做完運動：
+- 運動：{exercise_name}
+- 時間：{duration_minutes} 分鐘
+- 距離：{distance_display}
+- 消耗熱量：{calories_burned} 大卡
 
-請以熱情、鼓勵的語氣給予讚美與建議：
-1. 肯定他的付出對身心健康與體態的正面助益。
-2. 提醒運動後的補水、放鬆拉筋與適度蛋白質補充。
-3. 嚴格使用繁體中文，字數控制在 120 字以內，語氣流暢親切，可適度加入 emoji。
-4. 請不要使用 Markdown 符號（如 ** 或 * 或 #）。
+請用自然流暢、像朋友/教練聊天的口語口吻誇獎他：
+1. 誇獎他的堅持與運動成果。
+2. 提醒運動完記得多喝水、拉拉筋伸展，並適度補充蛋白質。
+3. 嚴格使用繁體中文，字數在 120 字以內，不要用 Markdown 符號（如 ** 或 * 或 #），不要有死板的機器人感。
 """
         try:
             llm = self._get_llm()
@@ -149,10 +148,10 @@ class CalorieAnalyzer:
             content = response.content.strip() if hasattr(response, "content") else str(response).strip()
             # Clean asterisks
             content = content.replace("**", "").replace("*", "")
-            return f"運動名稱：{exercise_name}，持續時間：{duration_minutes} 分鐘，消耗卡路里：{calories_burned} 大卡。\n\n{content}"
+            return f"運動項目：{exercise_name}，時間：{duration_minutes} 分鐘，消耗熱量：約 {calories_burned} 大卡。\n\n{content}"
         except Exception as e:
             logger.error(f"Error generating sport response: {e}")
-            return f"太棒了！您完成了 {duration_minutes} 分鐘的{exercise_name}，成功燃燒了 {calories_burned} 大卡！記得多補充水分並做伸展放鬆喔！💪✨"
+            return f"太棒啦！你完成了 {duration_minutes} 分鐘的{exercise_name}，消耗了差不多 {calories_burned} 大卡！運動完記得多喝水、拉拉筋放鬆一下喔！💪"
 
     def store_calorie_data(self, exercise_name: str, duration_minutes: int, calories_burned: int):
         """Persist exercise calorie data into database."""

@@ -144,20 +144,20 @@ JSON 範例格式：
     def _store_food_calories(self, food_json: List[Dict[str, Any]]) -> str:
         """Store extracted food calorie records into DB and construct summary text."""
         if not food_json or not isinstance(food_json, list):
-            return "無法辨識食物，請提供更清楚的描述。"
+            return "我看不太出這是什麼食物，可以描述一下吃了什麼或份量嗎～"
 
         food_calories_list = []
         total_calories_sum = 0
 
         for item in food_json:
-            food_name = item.get("food_name", "未知食物")
+            food_name = item.get("food_name", "食物")
             food_quantity = item.get("food_quantity", "1份")
             # Support both total_calories and legacy typo tatal_calories
             raw_cal = item.get("total_calories") or item.get("tatal_calories") or "0"
             total_calories = extract_numbers(raw_cal)
 
             food_name_portion = f"{food_quantity}{food_name}"
-            food_calories_list.append(f"{food_name_portion} 含有 {total_calories} 大卡")
+            food_calories_list.append(f"{food_name_portion} 約 {total_calories} 大卡")
             total_calories_sum += total_calories
 
             try:
@@ -173,7 +173,7 @@ JSON 範例格式：
                 logger.error(f"存入資料庫失敗: {e}")
 
         food_details = "，".join(food_calories_list)
-        return f"經過計算～{food_details}。總共含有 {total_calories_sum} 大卡，已幫您紀錄。"
+        return f"幫你算好囉～{food_details}，這餐總共大約含有 {total_calories_sum} 大卡，已經幫你記下來啦！"
 
     def store_analyze_calories_from_image(self, image_urls: List[str]) -> str:
         """End-to-end pipeline: image recognition -> info extraction -> database save."""
@@ -182,7 +182,7 @@ JSON 範例格式：
             return description
 
         if not description:
-            return "無法從圖片中辨識到食物，請再提供更清晰的圖片。"
+            return "照片好像看不出裡面有什麼食物，再拍一張清楚一點的給我試試！"
 
         json_result = self._extract_food_info(description)
         if isinstance(json_result, str):

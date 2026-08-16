@@ -108,22 +108,22 @@ def generate_brtr_prompt(user_id: str, user_data: Optional[Dict[str, Any]], acti
 
         if not is_valid:
             exceed_msg = (
-                f"您選擇了進行 {activity_type} {time_display}。\n\n"
-                "雖然運動對健康很有幫助，但為了避免運動傷害與身體過度負擔，"
-                f"建議單次 {activity_type} 時間不超過 {MAX_TIME_LIMITS.get(activity_type, 2.0)} 小時。\n\n"
-                "請記得保持充足休息與補水，持之以恆才是健康最好的捷徑喔！✨"
+                f"你選擇了進行 {activity_type} {time_display}。\n\n"
+                "雖然運動很棒，但為了避免運動傷害跟過度疲勞，"
+                f"建議單次 {activity_type} 不要超過 {MAX_TIME_LIMITS.get(activity_type, 2.0)} 小時喔！\n\n"
+                "記得適度休息與補水，規律運動效果才會最好～💪"
             )
             return False, exceed_msg
 
-        request = f"使用者基本資料：{user_description}。他今天計畫進行【{activity_type}】約【{time_display}】。請為他制定量身打造的運動建議。\n"
+        request = f"使用者基本資料：{user_description}。他今天計畫進行【{activity_type}】約【{time_display}】。請為他制定合適的運動建議。\n"
     else:
         request = f"使用者基本資料：{user_description}。目前尚未確定要進行哪種運動，請為他提供一組全方位的運動計畫建議。\n"
 
     tone = """
-【回覆規範】：
-- 請使用繁體中文，語氣保持溫暖、熱情且具有激勵感。
-- 請避免使用 Markdown 的「**」或「#」符號，一律以自然流暢的文字組織。
-- 總字數請控制在 350 字以內，適度穿插 emoji。
+【回覆風格】：
+- 請用自然口語、親切鼓勵的繁體中文，像教練在跟學員聊天給建議一樣，不要有死板的客服腔或機器人感。
+- 請避免使用 Markdown 的「**」或「#」符號。
+- 總字數請控制在 300 字以內。
 """
 
     result = """

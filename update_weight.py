@@ -29,10 +29,10 @@ class WeightUpdater:
                 self.user_db.update_data("weight", val)
 
             logger.info(f"Updated weight for user {self.user_id}: {val} kg")
-            return f"🎉 您的體重已成功更新為 {val:.1f} 公斤！點選「AI減肥攻略」可重新獲得專屬個人化建議喔！✨"
+            return f"體重幫你更新成 {val:.1f} 公斤囉！可以去按『AI減肥攻略』看看最新的建議～"
 
         except ValueError:
-            return "請輸入有效的體重數字，例如 65 或 65.5 公斤。"
+            return "請輸入體重數字喔，例如 65 或 65.5～"
         except Exception as e:
             logger.error(f"Error updating weight: {e}")
-            return "更新體重時發生錯誤，請稍後再試。"
+            return "更新體重時出了點問題，等一下再試試看喔！"
